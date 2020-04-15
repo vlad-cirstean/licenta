@@ -1,0 +1,66 @@
+<psk-page title="Render List">
+
+
+    <psk-container controller-name="RenderListController">
+
+        <psk-grid columns="2" layout="xs=[12,12] s=[12,12] m=[6,6] l=[6,6]">
+            <psk-card class="profile_selection">
+                <h3><psk-label label="Candidates"></psk-label></h3>
+
+                <psk-text-input view-model="search" placeholder="Filter by name"></psk-text-input>
+
+
+                <psk-condition condition="@ifSearchValue">
+                        <p slot="condition-true" >  Search results for: <psk-label label="@search.value"></psk-label></p>
+                        <p slot="condition-false" >Showing all results</p>
+                </psk-condition>
+
+                <psk-for-each data-view-model="entities">
+                        <psk-grid columns="3" layout="xs=[12,12,12] s=[12,12,12] m=[5,3,4] l=[5,3,4]" class="render-list">
+                            <psk-grid columns="2" layout="xs=[4,8] s=[4,8] m=[4,8] l=[4,8]">
+                                <psk-img class="profile small" src="@profilePic"></psk-img>
+                                <psk-label class="m-0 p-0 pl-3" label="@name"></psk-label>
+                            </psk-grid>
+
+                            <div>
+                                    <psk-icon icon="@status.icon.name" color="@status.icon.color"></psk-icon>
+                                    <psk-label label="@status.text"></psk-label>
+                            </div>
+                            <div class="text-right">
+                                <psk-toolbar actions="view,edit,close">
+                                    <psk-button class="p-0"  slot="view" button-class="no-style" event-name="changeView" event-data="@id"><psk-icon icon="eye"  title="View" color="#7aa354"></psk-icon></psk-button>
+                                    <psk-icon class="p-0" icon="edit" slot="edit" title="Edit" color="#7aa354"></psk-icon>
+                                    <psk-button class="p-0" slot="close" button-class="no-style" event-name="remove" event-data="@id"><psk-icon icon="close" title="Deactivate"  color="#7aa354"></psk-icon></psk-button>
+                                </psk-toolbar>
+                            </div>
+                        </psk-grid>
+                        <psk-card slot="no-data" title="No data"></psk-card>
+                </psk-for-each>
+
+            </psk-card>
+
+            <psk-card class="profile_container">
+                <psk-card class="user_profile">
+                    <psk-grid columns="2" layout="xs=[5,7] s=[4,8] m=[2,10] l=[2,10]">
+                        <psk-img class="profile" src="@current.profilePic"></psk-img>
+                        <h3><psk-label label="@current.name"></psk-label></h3>
+                    </psk-grid>
+
+                </psk-card>
+
+                <psk-card title="Description">
+                    <psk-label label="@current.description"></psk-label>
+                </psk-card>
+
+                <psk-card title="Attachments">
+                    <psk-attachments-list files="@current.attachments">
+                    </psk-attachments-list>
+                </psk-card>
+
+            </psk-card>
+
+        </psk-grid>
+
+
+    </psk-container>
+</psk-page>

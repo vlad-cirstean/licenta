@@ -1,0 +1,21 @@
+{
+    "name": "cardinal",
+    "version": "0.0.1",
+    "description": "PrivateSky Website Core for building self sovereign applications",
+    "scripts": {
+        "generate-sitemap": "node -r esm ./bin/generate-sitemap.js",
+        "web-server": "cd release && ws --spa ./index.html",
+        "dev": "gulp build && npm run web-server",
+        "build": "gulp build"
+    },
+    "devDependencies": {
+        "esm": "^3.2.25",
+        "gulp": "^4.0.2",
+        "gulp-include": "^2.4.1",
+        "gulp-run-command": "^0.0.9",
+        "local-web-server": "^3.0.7",
+        "vinyl-source-stream": "^2.0.0",
+        "cardinal": "file:../cardinal"
+    },
+    "license": "MIT"
+}

@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!octopus
+!octopus/*
+!web-server/secure-channels/wallet-template/**
+web-server/secure-channels/wallet-template/.DS_Store
+web-server/secure-channels/wallet-template/seed

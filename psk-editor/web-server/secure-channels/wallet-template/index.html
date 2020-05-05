@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PSK App Core</title>
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link href="/resources/css/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <script src="/assets/quill/quill.js"></script>
+    <link rel="stylesheet" href="/assets/quill/quill.snow.css">
+    <script src="/assets/crdt/crdt.js"></script>
+</head>
+
+<body>
+<psk-app-root>
+    <header>
+        <nav class="navbar navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">
+                <img src="/assets/images/icon.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+                PSK Text Editor
+            </a>
+        </nav>
+    </header>
+    <section>
+        <div id="editor"></div>
+        <hr>
+        <div id="editor2"></div>
+        <!--            <psk-app-router failRedirectTo="/home"></psk-app-router>-->
+    </section>
+    <div class="attributes">Icons made by <a href="https://www.flaticon.com/free-icon/file_884965" title="itim2101">itim2101</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+</psk-app-root>
+
+<script>
+    const crdt = new Crdt('#editor');
+    crdt.addEventListener('insert', (e) => crdt2.insertChar(e.detail));
+    crdt.addEventListener('delete', (e) => crdt2.deleteChar(e.detail));
+
+    const crdt2 = new Crdt('#editor2');
+    crdt2.addEventListener('insert', (e) => crdt.insertChar(e.detail));
+    crdt2.addEventListener('delete', (e) => crdt.deleteChar(e.detail));
+</script>
+
+
+<script src="/scripts/bundles/webshims.js"></script>
+<script src="/scripts/bundles/pskruntime.js"></script>
+<script src="/scripts/bundles/bindableModel.js"></script>
+
+<script type="module" src="/cardinal/cardinal.esm.js"></script>
+<script nomodule src="/cardinal.js"></script>
+<script>
+    globalConfig = {
+        theme: 'default'
+    };
+
+    if (window.parent) {
+        window.parent.postMessage({status: 'completed'}, '*');
+    }
+</script>
+</body>
+
+</html>

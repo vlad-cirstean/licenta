@@ -35,6 +35,17 @@
                 <button type="button" class="btn btn-outline-light" onclick="manager.copyToClipboard()"><i
                         class="fas fa-share-alt"></i>Share
                 </button>
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="peersDropdown"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span id="peersNumber" class="badge badge-light">4</span> Peers
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </div>
                 <input type="text" class="form-control" id="file-metadata" placeholder="Enter name">
                 <button type="button" class="btn btn-outline-success" onclick="manager.saveDocument()"><i
                         class="fas fa-save"></i>Save
@@ -85,6 +96,7 @@
         </div>
     </div>
 
+
     <!--    delete modal-->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-sm" role="document">
@@ -130,6 +142,25 @@
 <script>
     const manager = new Manager();
     manager.init();
+
+    $('#importModal').on('shown.bs.modal', function () {
+        $('#import').focus();
+    });
+
+
+    $('.ql-toolbar').on('stylechanged', function () {
+        console.log('css changed');
+    });
+
+    // Perform change
+    $('list-id').css('height', '300');
+    // const right = document.getElementById('list-id').style.height;
+    // const left = document.getElementsByClassName('ql-toolbar')[0].style.height;
+    // if (left > right) {
+    //     document.getElementById('list-id').style.height = left;
+    // } else {
+    //     document.getElementsByClassName('ql-toolbar')[0].style.height = right;
+    // }
 </script>
 
 

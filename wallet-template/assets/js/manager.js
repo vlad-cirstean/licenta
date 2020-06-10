@@ -11,14 +11,13 @@ class Manager {
         this.editor = new Editor('#editor');
         this.nullEditorValue = this.editor.getContents();
         this.editor.addEventListener('command', (e) => {
-            console.log(e.detail);
             this.communication.send(e.detail);
         });
 
         this.communication = new Communication();
         this.communication.addEventListener('remoteCommand', (e) => {
-            console.log(e.detail);
             this.editor.remoteCommand(e.detail);
+            this.communication.send(e.detail);
         });
 
         this.importField = document.getElementById('import');

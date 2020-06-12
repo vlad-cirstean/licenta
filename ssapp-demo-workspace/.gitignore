@@ -13,4 +13,9 @@
 !README.md
 !CHANGELOG
 
+!web-server
+!web-server/*
+!web-server/secure-channels
+!web-server/secure-channels/*
 !web-server/secure-channels/wallet-template
+!web-server/secure-channels/wallet-template/**

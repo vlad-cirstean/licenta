@@ -27,7 +27,12 @@ body, html {
 }
 
 .title-container {
-    margin-left: 37px;
+    margin-left: 50px;
+}
+
+.title-container > i {
+    color: white;
+    font-size: 1.6rem;
 }
 
 .title {
@@ -68,6 +73,7 @@ body, html {
     width: 100%;
 }
 
+
 .list {
     min-width: 250px;
     max-width: 250px;
@@ -90,7 +96,7 @@ body, html {
 }
 
 .list-item-active {
-    background: #eeeeee;
+    background: #f1f1f1;
 }
 
 .list-item-span {

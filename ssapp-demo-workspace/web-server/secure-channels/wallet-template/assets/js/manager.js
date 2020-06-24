@@ -19,13 +19,22 @@ class Manager {
             this.editor.remoteCommand(e.detail.ops);
             this.communication.fanout(e.detail.ops, e.detail.peer);
         });
+        this.communication.addEventListener('activePeers', (e) => {
+            this.current.activePeers = e.detail;
+            this.showPeers();
+        });
+        this.offset = 0;
+        this.communication.addEventListener('time', (e) => {
+            this.offset = e.detail;
+            console.log(this.offset);
+        });
 
         this.importField = document.getElementById('import');
     }
 
     async init() {
         this.edfs = new Edfs();
-        await this.edfs.init('http://localhost:8080');
+        await this.edfs.init('http://127.0.0.1:8080');
 
         this.loadDocuments();
     }
@@ -66,7 +75,6 @@ class Manager {
                 }
             }
         }
-        this.createSidebarElements();
         await this.loadDocumentContent();
     }
 
@@ -78,17 +86,54 @@ class Manager {
         this.editor.setContents(document);
         const metadata = await this.edfs.readFile(`/${id}/metadata`);
         this.current.name = metadata.name;
-
+        this.editField.value = metadata.name;
+        this.current.peers = metadata.peers;
 
         this.communication.stop();
         this.communication.start(this.current.userId, metadata.peers);
-        // this.edfs.dossier.readDir(`/${id}`,(err, entries)=>{
-        //     if (err) {
-        //         throw err;
-        //     }
-        //
-        //     console.log(entries);
-        // })
+
+        this.showPeers();
+        this.createSidebarElements();
+    }
+
+    showPeers() {
+        const e = document.getElementById('peers-id');
+        e.innerHTML = '';
+
+        if (!this.current.activePeers) {
+            this.current.activePeers = [];
+        }
+
+        if (this.communication.isMaster()) {
+            const newElement = document.createElement('h6');
+            newElement.classList.add('dropdown-header');
+            newElement.innerText = 'Active peers';
+            e.appendChild(newElement);
+
+            const peersNumber = document.getElementById('peersNumber');
+            peersNumber.innerText = this.current.activePeers.length || 0;
+
+            for (const i of this.current.activePeers) {
+                const newElement = document.createElement('a');
+                newElement.classList.add('dropdown-item');
+                newElement.innerText = i;
+                e.appendChild(newElement);
+            }
+        }
+
+        const newElement = document.createElement('h6');
+        newElement.classList.add('dropdown-header');
+        newElement.innerText = 'Peers';
+        e.appendChild(newElement);
+
+        for (const i of this.current.peers) {
+            if (!this.current.activePeers.includes(i)) {
+                const newElement = document.createElement('a');
+                newElement.classList.add('dropdown-item');
+                newElement.innerText = i;
+                e.appendChild(newElement);
+            }
+        }
     }
 
 
@@ -97,7 +142,7 @@ class Manager {
         this.saveDocuments();
 
         const content = this.editor.getContents();
-        if (this.current && this.communication && this.communication.isMaster()) {
+        if (this.current && this.communication) {
             const {id, name} = this.current;
             await this.edfs.writeFile(`/${id}/content`, content);
             const metadata = await this.edfs.readFile(`/${id}/metadata`);
@@ -134,6 +179,7 @@ class Manager {
         //     })
         //     .catch((err) => {
         //         console.error(err);
+        //         this.changeCurrent();
         //     });
 
         const documents = JSON.parse(localStorage.getItem('documents'));

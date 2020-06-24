@@ -13,7 +13,6 @@ class Communication extends EventTarget {
         this.incomingConnections = [];
         this.outgoingConnections = [];
         this.interval = null;
-
     }
 
     start(id, peers) {
@@ -25,6 +24,7 @@ class Communication extends EventTarget {
             port: 9000,
             path: '/myapp'
         });
+        this.activePeers = {};
         console.log('I am:' + id, this.peers);
 
         const self = this;
@@ -32,6 +32,7 @@ class Communication extends EventTarget {
             console.log('new connection');
             this.incomingConnections.push(connection);
             connection.on('data', (data) => self._handleMessages(connection, data));
+            connection.on('error', (e) => console.error(e));
         });
 
         for (const peer of this.peers) {
@@ -51,18 +52,25 @@ class Communication extends EventTarget {
                 this.master = this.id;
             } else if (this.isMaster()) {
                 console.log('sending heartbeats');
+                this.incomingConnections = this.incomingConnections.filter(peer => peer.open);
                 this.incomingConnections.forEach(i => {
-                    i.send('pskeditor:heartbeat');
+                    i.send(`pskeditor:heartbeat`);
                 });
-            } else if (Date.now() - this.lastHeartbeat > 4000) {
+            } else if (Date.now() - this.lastHeartbeat > 5000) {
                 console.log('missed heartbeat');
+                this.stop();
+                this.start(id, peers);
+            } else {
+                this.masterConnection.send(`pskeditor:active:${Date.now()}`);
             }
+            const activePeers = Object.entries(this.activePeers).filter(i => Date.now() - i[1] < 3000).map(i => i[0]);
+            this.dispatchEvent(new CustomEvent('activePeers', {detail: activePeers}));
 
         }, 2000);
     }
 
+
     send(data) {
-        console.log(this.isMaster());
         const message = 'pskeditor:ops:' + JSON.stringify(data);
         if (this.isMaster()) {
             this.fanout(data);
@@ -72,7 +80,6 @@ class Communication extends EventTarget {
     }
 
     fanout(data, peer) {
-        console.log(peer);
         const message = 'pskeditor:ops:' + JSON.stringify(data);
         if (this.isMaster()) {
             this.incomingConnections.forEach(i => i.peer !== peer && i.send(message));
@@ -88,6 +95,7 @@ class Communication extends EventTarget {
     stop() {
         clearInterval(this.interval);
         this._stopConnections();
+        this.peer && this.peer.disconnect();
     }
 
     isMaster() {
@@ -100,7 +108,7 @@ class Communication extends EventTarget {
 
     _handleMessages(connection, data) {
         const peer = connection.peer;
-        console.log(peer);
+        console.log(data + ' from peer: ' + connection.peer);
         if (data === 'pskeditor:candidate') {
             if (this.master) {
                 connection.send(`pskeditor:master:${this.master}`);
@@ -108,13 +116,31 @@ class Communication extends EventTarget {
         } else if (data.includes('pskeditor:master')) {
             this.master = data.replace('pskeditor:master:', '');
             this._stopConnections(this.master);
-            this.masterConnection = this.peer.connect(this.master);
+            if (!this.isMaster()) {
+                this.masterConnection = this.peer.connect(this.master);
+            }
         } else if (data === 'pskeditor:heartbeat') {
             this.lastHeartbeat = Date.now();
+        } else if (data.includes('pskeditor:active')) {
+            if (this.isMaster()) {
+                const time = data.replace('pskeditor:active:', '');
+                this.activePeers[connection.peer] = Date.now();
+                for (const conn of [...this.outgoingConnections, ...this.incomingConnections]) {
+                    if (conn.peer === peer) {
+                        conn.send(`pskeditor:time:${time}:${Date.now()}`);
+                    }
+                }
+            }
         } else if (data.includes('pskeditor:ops')) {
             const ops = JSON.parse(data.replace('pskeditor:ops:', ''));
             this.dispatchEvent(new CustomEvent('remoteCommand', {detail: {ops, peer}}));
+        } else if (data.includes('pskeditor:time')) {
+            if (!this.isMaster()) {
+                const receivedTime = data.match(/^pskeditor:time:(\d+):(\d+)$/);
+                const now = Date.now();
+                const offset = receivedTime[2] - receivedTime[1] - Math.round((now - receivedTime[1]) / 2);
+                this.dispatchEvent(new CustomEvent('time', {detail: offset}));
+            }
         }
-        console.log(data + ' from peer:' + connection.peer);
     }
 }

@@ -13,19 +13,16 @@ const toolbarOptions = [
 class Editor extends EventTarget {
     constructor(id) {
         super();
-        this.text = [];
-        this.counter = 1;
         this.editor = new Quill(id, {
             theme: 'snow',
             modules: {
                 toolbar: toolbarOptions
             }
         });
-
+        this.offset = 0;
+        this.content = [];
 
         this.editor.on('text-change', (delta, oldDelta, source) => {
-            // console.log(delta, oldDelta, id);
-
             if (source !== 'user' || !delta) {
                 return;
             }
@@ -33,25 +30,55 @@ class Editor extends EventTarget {
         });
     }
 
+    setOffset(offset) {
+        this.offset = offset;
+    }
+
+    setNull(nullContent) {
+        this.nullContent = nullContent;
+    }
+
     remoteCommand(commands) {
-        try {
-            this.editor.updateContents(commands);
-        } catch (e) {
-            console.error(e);
+        const cursor = this.editor.getSelection();
+        this.orderCommands(commands);
+        let content = this.content.map(i => i.commands);
+        this.editor.setContents(this.nullContent);
+
+        for (const i of content) {
+            this.editor.updateContents(i);
         }
+
+        if (cursor) {
+            this.editor.setSelection(cursor.index);
+        }
+
     }
 
     localCommand(commands) {
-        this.dispatchEvent(new CustomEvent('command', {detail: commands}));
+        this.orderCommands(this.addTimestamp(commands));
+        this.dispatchEvent(new CustomEvent('command', {detail: this.addTimestamp(commands)}));
     }
 
     setContents(commands) {
-        this.editor.setContents(commands);
+        this.editor.setContents(commands.commands);
+        this.content = [];
+        this.content.push(commands);
     }
 
 
     getContents() {
-        return this.editor.getContents();
+        return this.addTimestamp(this.editor.getContents());
     }
 
+    addTimestamp(commands) {
+        return {
+            timestamp: Date.now() + this.offset,
+            commands
+        };
+    }
+
+    orderCommands(commands) {
+        this.content.push(commands);
+        this.content.sort((a, b) => a.timestamp - b.timestamp);
+    }
 }

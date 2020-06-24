@@ -1,12 +1,29 @@
 class Edfs {
     async init(endpoint) {
         this.edfs = require('edfs').attachToEndpoint(endpoint);
-        this.dossier = await this.createDossier();
+        this.dossier = null;
+    }
+
+    setDossier(dossier) {
+        this.dossier = dossier;
     }
 
     async createDossier() {
         return new Promise((resolve, reject) => {
             this.edfs.createRawDossier((err, dossier) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(dossier);
+                }
+            });
+        });
+    }
+
+
+    async loadDossier(seed) {
+        return new Promise((resolve, reject) => {
+            this.edfs.loadRawDossier(seed, (err, dossier) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -74,6 +91,19 @@ class Edfs {
                     reject(err);
                 } else {
                     resolve(dossier.getSeed());
+                }
+            });
+        });
+    }
+
+    async createWallet(content) {
+        const dossier = await this.createDossier();
+        return new Promise((resolve, reject) => {
+            dossier.writeFile('documents', JSON.stringify(content), (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(dossier);
                 }
             });
         });

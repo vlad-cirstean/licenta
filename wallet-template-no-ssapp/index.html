@@ -12,109 +12,108 @@
     <script src="./assets/js/bootstrap/bootstrap.min.js"></script>
 
     <script src="./assets/js/quill.js"></script>
-    <script src="./assets/js/editor.js"></script>
     <script src="./assets/js/uuidv4.min.js"></script>
     <script src="./assets/js/peerjs.min.js"></script>
-    <script src="./assets/js/communication.js"></script>
-    <script src="./assets/js/manager.js"></script>
-    <script src="./assets/js/edfs.js"></script>
+
+    <script src="./src/editor.js"></script>
+    <script src="./src/communication.js"></script>
+    <script src="./src/manager.js"></script>
+    <script src="./src/edfs.js"></script>
 </head>
 
 <body>
-<psk-app-root controller="EditorController">
-    <header>
-        <nav class="navbar navbar-dark bg-dark">
-            <div class="title-container">
-                <i class="fas fa-cat"></i>
-                <span class="title">Kira Text</span>
-            </div>
-            <div class="file-metadata-container">
-                <button type="button" class="btn btn-outline-light" data-toggle="modal" data-target="#importModal">
-                    <i class="fas fa-file-import"></i> Import
-                </button>
-                <button type="button" class="btn btn-outline-light" onclick="manager.copyToClipboard()"><i
-                        class="fas fa-share-alt"></i>Share
-                </button>
-                <div class="dropdown">
-                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="peersDropdown"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span id="peersNumber" class="badge badge-light"></span> Peers
-                    </button>
-                    <div class="dropdown-menu" id="peers-id">
-                    </div>
-                </div>
-                <input type="text" class="form-control" id="file-metadata" placeholder="Enter name">
-                <button type="button" class="btn btn-outline-success" onclick="manager.saveDocument()"><i
-                        class="fas fa-save"></i>Save
-                </button>
-                <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteModal"><i
-                        class="fas fa-trash-alt"></i>Delete
-                </button>
-            </div>
-        </nav>
-    </header>
-    <section class="main-container">
-        <div class="list" id="list-id">
-            <div class="list-item new-item" onclick="manager.newDocument()">
-                <span><i class="fas fa-plus-circle"></i> New Document</span>
-            </div>
-
-
+<header>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="title-container">
+            <i class="fas fa-cat"></i>
+            <span class="title">Kira Text</span>
         </div>
-        <div class="editor-container">
-            <div id="editor"></div>
+        <div class="file-metadata-container">
+            <button type="button" class="btn btn-outline-light" data-toggle="modal" data-target="#importModal">
+                <i class="fas fa-file-import"></i> Import
+            </button>
+            <button type="button" class="btn btn-outline-light" onclick="manager.copyToClipboard()"><i
+                    class="fas fa-share-alt"></i>Share
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="peersDropdown"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span id="peersNumber" class="badge badge-light"></span> Peers
+                </button>
+                <div class="dropdown-menu" id="peers-id">
+                </div>
+            </div>
+            <input type="text" class="form-control" id="file-metadata" placeholder="Enter name">
+            <button type="button" class="btn btn-outline-success" onclick="manager.saveDocument()"><i
+                    class="fas fa-save"></i>Save
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteModal"><i
+                    class="fas fa-trash-alt"></i>Delete
+            </button>
+        </div>
+    </nav>
+</header>
+<section class="main-container">
+    <div class="list" id="list-id">
+        <div class="list-item new-item" onclick="manager.newDocument()">
+            <span><i class="fas fa-plus-circle"></i> New Document</span>
         </div>
 
-    </section>
 
-    <!--   import modal-->
-    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Import Document</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control" id="import" placeholder="Enter seed">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal"
-                            onclick="manager.importDocument()">Import
-                    </button>
-                </div>
+    </div>
+    <div class="editor-container">
+        <div id="editor"></div>
+    </div>
+
+</section>
+
+<!--   import modal-->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Document</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="import" placeholder="Enter seed">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"
+                        onclick="manager.importDocument()">Import
+                </button>
             </div>
         </div>
     </div>
+</div>
 
 
-    <!--    delete modal-->
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Are you sure?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"
-                            onclick="manager.deleteDocument()">Delete
-                    </button>
-                </div>
+<!--    delete modal-->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"
+                        onclick="manager.deleteDocument()">Delete
+                </button>
             </div>
         </div>
     </div>
-</psk-app-root>
+</div>
 
-<script src="./scripts/bundles/webshims.js"></script>
-<script src="./scripts/bundles/pskruntime.js"></script>
-<script src="./scripts/bundles/edfsBar.js"></script>
+<script src="./assets/bundles/webshims.js"></script>
+<script src="./assets/bundles/pskruntime.js"></script>
+<script src="./assets/bundles/edfsBar.js"></script>
 
 <script>
     const manager = new Manager();
@@ -127,5 +126,4 @@
 
 
 </body>
-
 </html>
